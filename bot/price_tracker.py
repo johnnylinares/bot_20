@@ -3,7 +3,7 @@ import asyncio
 from binance.client import Client
 from bot.alert_handler import send_alert
 
-async def price_tracker(client: Client, bot, channel_id, threshold=20):
+async def price_tracker(client: Client, bot, channel_id, threshold=0.01):
     price_history = {}
 
     while True:
