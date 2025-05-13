@@ -6,4 +6,4 @@ mplfinance
 python-binance
 requests
 cryptography
-aiohttp
+aiohttp 
