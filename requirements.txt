@@ -1,6 +1,8 @@
-python-telegram-bot==20.0
+python-telegram-bot
+requests
+cryptography==3.4.8
 python-dotenv
 binance
-pandas
 mplfinance
-cryptography
+matplotlib
+pandas
