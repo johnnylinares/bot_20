@@ -1,8 +1,9 @@
-python-telegram-bot
-requests
-cryptography==3.4.8
+python-telegram-bot==13.15
 python-dotenv
-binance
-mplfinance
 matplotlib
 pandas
+mplfinance
+python-binance
+requests
+cryptography
+aiohttp
