@@ -1,8 +1,12 @@
+# Libreries
 import time
 import asyncio
 from binance.client import Client
+
+# Conections
 from bot.alert_handler import send_alert
 
+# Function
 async def price_tracker(client: Client, bot, channel_id, threshold=0.01):
     price_history = {}
 
