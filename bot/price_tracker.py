@@ -2,26 +2,35 @@
 import time
 import asyncio
 from binance.client import Client
+from logs import log_message
 
 # Conections
 from bot.alert_handler import send_alert
 
 # Function
-async def price_tracker(client: Client, bot, channel_id, threshold=0.01):
+async def price_tracker(client: Client, bot, channel_id, threshold=20):
+    await log_message(message="🤖 PRICE TRACKER ACTIVATED")
+
     price_history = {}
+    log_interval = 600
+    last_log_time = time.time()
 
     while True:
         try:
             tickers = client.futures_ticker()
             now = time.time()
+            coins_being_checked = []
 
             for ticker in tickers:
+
                 symbol = ticker['symbol']
                 price = float(ticker['lastPrice'])
 
                 if not symbol.endswith("USDT"):
                     continue
 
+                coins_being_checked.append(symbol)
+                
                 if symbol not in price_history:
                     price_history[symbol] = []
 
@@ -33,11 +42,17 @@ async def price_tracker(client: Client, bot, channel_id, threshold=0.01):
                     percentage_change = ((price - old_price) / old_price) * 100
 
                     if abs(percentage_change) >= threshold:
+                        await log_message(message=f"📊 COIN FOUND: {symbol}")
                         await send_alert(symbol, percentage_change)
                         price_history[symbol] = []  # Reset para evitar spam
+                        
+            if now - last_log_time >= log_interval and coins_being_checked:
+                log_message_text = f"🔍 Checking coins"
+                await log_message(log_message_text)
+                last_log_time = now
 
             await asyncio.sleep(10)
 
         except Exception as e:
-            print(f"[ERROR] {e}")
+            await log_message(message=f"[ERROR] {e}")
             await asyncio.sleep(10)
