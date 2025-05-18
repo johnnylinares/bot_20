@@ -1,14 +1,11 @@
-# Libreries
 import time
 import asyncio
 from binance.client import Client
-from logs import log_message
 
-# Conections
+from logs import log_message
 from bot.alert_handler import send_alert
 
-# Function
-async def price_tracker(client: Client, bot, channel_id, threshold=0.01):
+async def price_tracker(client: Client, bot, channel_id, threshold=20):
     await log_message(message="🤖 PRICE TRACKER ACTIVATED")
 
     price_history = {}
@@ -23,7 +20,7 @@ async def price_tracker(client: Client, bot, channel_id, threshold=0.01):
             for ticker in tickers:
                 symbol = ticker['symbol']
                 price = float(ticker['lastPrice'])
-                volume_24h = round((float(ticker['volume'])) / 1000000)
+                volume_24h = round((float(ticker['volume'])) / 1000000, 1)
 
                 if not symbol.endswith("USDT"):
                     continue
@@ -49,7 +46,7 @@ async def price_tracker(client: Client, bot, channel_id, threshold=0.01):
                             emoji2 = "📉"
 
                         await send_alert(symbol, percentage_change, price, emoji1, emoji2, volume_24h)
-                        price_history[symbol] = []  # Reset para evitar spam
+                        price_history[symbol] = []
                         
             if now - last_log_time >= log_interval:
                 log_message_text = f"🔍 Checking coins"
