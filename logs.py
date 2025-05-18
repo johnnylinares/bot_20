@@ -7,9 +7,11 @@ from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv()
 
+# Venv
 CHANNEL_LOG_ID = os.getenv("CHANNEL_LOG_ID") 
 bot_log = telegram.Bot(token=os.getenv("BOT_LOG_TOKEN"))
 
+# Function
 async def log_message(message):
     now = datetime.now()
     timestamp = now.strftime("%H:%M:%S")

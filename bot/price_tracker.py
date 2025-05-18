@@ -8,7 +8,7 @@ from logs import log_message
 from bot.alert_handler import send_alert
 
 # Function
-async def price_tracker(client: Client, bot, channel_id, threshold=20):
+async def price_tracker(client: Client, bot, channel_id, threshold=0.01):
     await log_message(message="🤖 PRICE TRACKER ACTIVATED")
 
     price_history = {}
@@ -19,17 +19,14 @@ async def price_tracker(client: Client, bot, channel_id, threshold=20):
         try:
             tickers = client.futures_ticker()
             now = time.time()
-            coins_being_checked = []
 
             for ticker in tickers:
-
                 symbol = ticker['symbol']
                 price = float(ticker['lastPrice'])
+                volume_24h = round((float(ticker['volume'])) / 1000000)
 
                 if not symbol.endswith("USDT"):
                     continue
-
-                coins_being_checked.append(symbol)
                 
                 if symbol not in price_history:
                     price_history[symbol] = []
@@ -43,10 +40,18 @@ async def price_tracker(client: Client, bot, channel_id, threshold=20):
 
                     if abs(percentage_change) >= threshold:
                         await log_message(message=f"📊 COIN FOUND: {symbol}")
-                        await send_alert(symbol, percentage_change)
+
+                        if percentage_change > 0:
+                            emoji1 = "🟢"
+                            emoji2 = "📈"
+                        else:
+                            emoji1 = "🔴"
+                            emoji2 = "📉"
+
+                        await send_alert(symbol, percentage_change, price, emoji1, emoji2, volume_24h)
                         price_history[symbol] = []  # Reset para evitar spam
                         
-            if now - last_log_time >= log_interval and coins_being_checked:
+            if now - last_log_time >= log_interval:
                 log_message_text = f"🔍 Checking coins"
                 await log_message(log_message_text)
                 last_log_time = now
